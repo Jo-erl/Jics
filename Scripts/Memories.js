@@ -1,4 +1,6 @@
 const MAX_COUNT = 550;
+const ANIMATION_DURATION = 1000; 
+const FRAME_INTERVAL = 16; 
 
 function getStoredData() {
   const stored = localStorage.getItem("counterData");
@@ -11,7 +13,6 @@ function getStoredData() {
   };
 }
 
-// Update the stored data
 function updateStoredData(count) {
   localStorage.setItem(
     "counterData",
@@ -22,6 +23,10 @@ function updateStoredData(count) {
   );
 }
 
+function easeOutQuad(t) {
+  return t * (2 - t);
+}
+
 function animateCount(target) {
   let counterData = getStoredData();
   let current = counterData.count;
@@ -30,33 +35,70 @@ function animateCount(target) {
   // Check if it's a new day
   const today = new Date().toDateString();
   if (today !== counterData.lastUpdate && current < MAX_COUNT) {
-    current++; // Increment count for the new day
+    current++;
     updateStoredData(current);
   }
 
-  function update() {
+  // Animation variables
+  const startValue = current;
+  const changeInValue = target - startValue;
+  const startTime = performance.now();
+  let previousTimestamp = startTime;
+
+  function update(currentTime) {
+    // Skip frame if too soon
+    if (currentTime - previousTimestamp < FRAME_INTERVAL) {
+      requestAnimationFrame(update);
+      return;
+    }
+
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+    const easedProgress = easeOutQuad(progress);
+
+    current = Math.round(startValue + changeInValue * easedProgress);
     counterElement.textContent = current;
-    if (current < target) {
-      current++;
+
+    previousTimestamp = currentTime;
+
+    if (progress < 1) {
       requestAnimationFrame(update);
     }
   }
-  update();
+
+  requestAnimationFrame(update);
+}
+
+function throttle(func, limit) {
+  let inThrottle;
+  return function () {
+    const args = arguments;
+    const context = this;
+    if (!inThrottle) {
+      func.apply(context, args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
 }
 
 function handleScroll() {
   const section = document.getElementById("counter-section");
   const rect = section.getBoundingClientRect();
-  if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+  const buffer = window.innerHeight * 0.2; 
+
+  if (rect.top <= window.innerHeight - buffer && rect.bottom >= buffer) {
     animateCount(MAX_COUNT);
+
+    document.removeEventListener("scroll", throttledHandleScroll);
   }
 }
 
-// Initialize counter on page load
+const throttledHandleScroll = throttle(handleScroll, 100);
+
 document.addEventListener("DOMContentLoaded", () => {
   const counterElement = document.getElementById("counter");
   const counterData = getStoredData();
   counterElement.textContent = counterData.count;
+  document.addEventListener("scroll", throttledHandleScroll);
 });
-
-document.addEventListener("scroll", handleScroll);
