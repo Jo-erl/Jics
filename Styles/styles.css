@@ -127,14 +127,14 @@ h3 {
 .header {
   position: relative;
   width: 100%;
-  height: 100vh;  
-  min-height: 100vh;  
+  height: 100vh;
+  min-height: 100vh;
   background: url("../Images/Header.gif") no-repeat center center/cover;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;  
-  overflow: hidden;  
+  justify-content: space-between;
+  overflow: hidden;
 }
 
 /********************************************************************/
@@ -212,18 +212,18 @@ nav ul li a:hover {
 
 /********************************************************************/
 .header-content {
-  flex-grow: 1;  
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;  
+  justify-content: center;
   text-align: center;
   gap: 1.5rem;
   width: 100%;
 }
 
- .header-content .large-logo {
-  max-width: 500px; 
+.header-content .large-logo {
+  max-width: 500px;
   height: auto;
 }
 
@@ -391,9 +391,21 @@ h3 {
   display: block;
 }
 
-.gallery-item:hover {
+.gallery-item:hover,
+.gallery-item:active {
   filter: grayscale(0%);
   transform: scale(1);
+}
+
+@media (hover: hover) {
+  .gallery-item {
+    filter: grayscale(100%);
+  }
+
+  .gallery-item:hover {
+    filter: grayscale(0%);
+    transform: scale(1);
+  }
 }
 
 /********************************************************************/
