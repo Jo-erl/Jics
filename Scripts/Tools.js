@@ -1,3 +1,5 @@
+let animationTriggered = false;
+
 function resetProgress(progressBar) {
   progressBar.style.width = "0%";
   const percentageEl = progressBar
@@ -7,14 +9,18 @@ function resetProgress(progressBar) {
 }
 
 function animateProgress(progressBar) {
+  // Prevent re-triggering animation if already done
+  if (progressBar.classList.contains("animated")) return;
+
   const target = progressBar.getAttribute("data-target");
   progressBar.style.width = target + "%";
+  progressBar.classList.add("animated");
 
-  // Animate percentage number
   const percentageEl = progressBar
     .closest(".progress-wrapper")
     .querySelector(".percentage");
-  const duration = 1500; // 1.5 seconds to match CSS transition
+
+  const duration = 10000; // 10 seconds
   const startTime = performance.now();
   const startValue = 0;
   const endValue = parseInt(target);
@@ -23,10 +29,13 @@ function animateProgress(progressBar) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
 
-    // Easing function for smooth animation
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const current = Math.round(startValue + (endValue - startValue) * eased);
+    // Smoother easing function
+    const eased =
+      progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
+    const current = Math.round(startValue + (endValue - startValue) * eased);
     percentageEl.textContent = `${current}%`;
 
     if (progress < 1) {
@@ -43,12 +52,15 @@ function handleScroll() {
 
   const sectionRect = section.getBoundingClientRect();
   const isVisible =
-    sectionRect.top < window.innerHeight && sectionRect.bottom >= 0;
+    sectionRect.top < window.innerHeight * 0.75 && sectionRect.bottom >= 0;
 
-  if (isVisible) {
+  if (isVisible && !animationTriggered) {
     progressBars.forEach(animateProgress);
-  } else {
+    animationTriggered = true;
+  } else if (!isVisible) {
     progressBars.forEach(resetProgress);
+    progressBars.forEach((bar) => bar.classList.remove("animated"));
+    animationTriggered = false;
   }
 }
 

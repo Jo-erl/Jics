@@ -1,6 +1,6 @@
 const MAX_COUNT = 550;
-const ANIMATION_DURATION = 2500; 
-const FRAME_INTERVAL = 16; 
+const ANIMATION_DURATION = 2500;
+const FRAME_INTERVAL = 16;
 
 function getStoredData() {
   const stored = localStorage.getItem("counterData");
@@ -85,11 +85,10 @@ function throttle(func, limit) {
 function handleScroll() {
   const section = document.getElementById("counter-section");
   const rect = section.getBoundingClientRect();
-  const buffer = window.innerHeight * 0.2; 
+  const buffer = window.innerHeight * 0.2;
 
   if (rect.top <= window.innerHeight - buffer && rect.bottom >= buffer) {
     animateCount(MAX_COUNT);
-
     document.removeEventListener("scroll", throttledHandleScroll);
   }
 }
