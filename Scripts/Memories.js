@@ -1,5 +1,5 @@
 const MAX_COUNT = 550;
-const ANIMATION_DURATION = 1000; 
+const ANIMATION_DURATION = 2500; 
 const FRAME_INTERVAL = 16; 
 
 function getStoredData() {
